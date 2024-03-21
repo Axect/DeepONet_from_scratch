@@ -19,9 +19,17 @@ fn main() {
         .map(|grf| grf.min())
         .collect::<Vec<_>>();
 
-    let grf_scaled = grf_vec.iter().zip(grf_max_vec.iter()).zip(grf_min_vec.iter())
-        .map(|((grf, max), min)| {
-            grf.fmap(|x| (x - min) / (max - min))
+    let grf_max_mean = grf_max_vec.mean();
+    let grf_max_std  = grf_max_vec.sd();
+    let grf_max_3sigma = grf_max_mean + 1.0 * grf_max_std;
+
+    let grf_min_mean = grf_min_vec.mean();
+    let grf_min_std  = grf_min_vec.sd();
+    let grf_min_3sigma = grf_min_mean - 1.0 * grf_min_std;
+
+    let grf_scaled = grf_vec.iter()
+        .map(|grf| {
+            grf.fmap(|x| (x - grf_min_3sigma) / (grf_max_3sigma - grf_min_3sigma))
         }).collect::<Vec<_>>();
 
     let x = linspace_with_precision(x_min, x_max, 1000, 3);
