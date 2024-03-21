@@ -1,0 +1,8 @@
+[package]
+name = "grf_generator"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+peroxide = { version = "0.34.7", features = ["plot", "parquet"] }
+rugfield = "0.1.0"
