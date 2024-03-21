@@ -10,7 +10,7 @@ fn main() {
     let n = 1000;
 
     let grf_vec = (0 .. n)
-        .map(|_| gen_grf(x_min, x_max, 0.1, 100))
+        .map(|_| gen_grf(x_min, x_max, 0.1, 1000))
         .collect::<Vec<_>>();
 
     // Normalize
@@ -37,8 +37,8 @@ fn main() {
             grf.fmap(|x| (x - grf_min_sigma) / (grf_max_sigma - grf_min_sigma) * 2f64 - 1f64)
         }).collect::<Vec<_>>();
 
-    let x = linspace_with_precision(x_min, x_max, 100, 3);
-    let y_range = linspace_with_precision(x_min, x_max, 20, 1);
+    let x = linspace_with_precision(x_min, x_max, 1000, 3);
+    let y_range = linspace_with_precision(x_min, x_max, 100, 3);
 
     // Integration
     let grf_int_vec = grf_scaled_vec
