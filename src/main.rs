@@ -56,16 +56,20 @@ fn main() {
     let mut df = DataFrame::new(vec![]);
     let x_cycle = x.iter().cycle().take(n * x.len()).cloned().collect::<Vec<_>>();
     let grf_flatten = grf_scaled_vec.iter().flatten().cloned().collect::<Vec<_>>();
+    let group = (0u64 .. n as u64).flat_map(|i| std::iter::repeat(i).take(x_len)).collect::<Vec<_>>();
     df.push("x", Series::new(x_cycle));
     df.push("grf", Series::new(grf_flatten));
+    df.push("group", Series::new(group));
     df.write_parquet("data/grf.parquet", CompressionOptions::Uncompressed).unwrap();
     df.print();
 
     let mut dg = DataFrame::new(vec![]);
     let y_cycle = y_range.iter().cycle().take(n * y_range.len()).cloned().collect::<Vec<_>>();
     let grf_int_flatten = grf_int_vec.iter().flatten().cloned().collect::<Vec<_>>();
+    let group = (0u64 .. n as u64).flat_map(|i| std::iter::repeat(i).take(y_range.len())).collect::<Vec<_>>();
     dg.push("y", Series::new(y_cycle));
     dg.push("grf_int", Series::new(grf_int_flatten));
+    dg.push("group", Series::new(group));
     dg.write_parquet("data/grf_int.parquet", CompressionOptions::Uncompressed).unwrap();
     dg.print();
 
