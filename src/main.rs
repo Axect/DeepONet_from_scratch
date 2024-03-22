@@ -51,6 +51,23 @@ fn main() {
         })
         .collect::<Vec<_>>();
 
+    // Save parquet
+    let mut df = DataFrame::new(vec![]);
+    let x_cycle = x.iter().cycle().take(n * x.len()).cloned().collect::<Vec<_>>();
+    let grf_flatten = grf_scaled_vec.iter().flatten().cloned().collect::<Vec<_>>();
+    df.push("x", Series::new(x_cycle));
+    df.push("grf", Series::new(grf_flatten));
+    df.write_parquet("data/grf.parquet", CompressionOptions::Uncompressed).unwrap();
+    df.print();
+
+    let mut dg = DataFrame::new(vec![]);
+    let y_cycle = y_range.iter().cycle().take(n * y_range.len()).cloned().collect::<Vec<_>>();
+    let grf_int_flatten = grf_int_vec.iter().flatten().cloned().collect::<Vec<_>>();
+    dg.push("y", Series::new(y_cycle));
+    dg.push("grf_int", Series::new(grf_int_flatten));
+    dg.write_parquet("data/grf_int.parquet", CompressionOptions::Uncompressed).unwrap();
+    dg.print();
+
     // Plot grf
     let samples = 4;
     let line_style = [LineStyle::Solid, LineStyle::Dotted, LineStyle::Dashed, LineStyle::DashDot];
@@ -69,7 +86,7 @@ fn main() {
         plt.insert_image(grf.clone());
     }
     plt
-        .set_path("grf_scaled.png")
+        .set_path("figs/grf_scaled.png")
         .set_xlabel(r"$x$")
         .set_ylabel(r"$y$")
         .set_style(PlotStyle::Nature)
@@ -87,7 +104,7 @@ fn main() {
         plt.insert_image(sol.clone());
     }
     plt
-        .set_path("grf_integral.png")
+        .set_path("figs/grf_integral.png")
         .set_xlabel(r"$x$")
         .set_ylabel(r"$y$")
         .set_style(PlotStyle::Nature)
