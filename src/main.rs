@@ -7,7 +7,7 @@ fn main() {
     // Gaussian Random Field generation
     let x_min = 0f64;
     let x_max = 1f64;
-    let n = 1000;
+    let n = 10000;
     let x_len = 1000;
 
     let grf_vec = (0 .. n)
