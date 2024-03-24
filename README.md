@@ -1,4 +1,4 @@
-# DeepONet Tutorial
+# DeepONet from Scratch
 
 ## Data
 
