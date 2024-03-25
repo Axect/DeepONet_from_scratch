@@ -7,13 +7,13 @@ fn main() {
     // Gaussian Random Field generation
     let x_min = 0f64;
     let x_max = 1f64;
-    let n = 10000;
+    let n = 100000;
     let x_len = 1000;
     //let l_uniform = WeightedUniform::new(
     //    vec![3f64, 3f64, 2f64, 2f64],
     //    vec![0.1, 0.2, 0.3, 0.4, 0.5],
     //);
-    let l_uniform = Uniform(0.1, 0.5);
+    let l_uniform = Uniform(0.1, 0.4);
     let l_samples = l_uniform.sample(n);
 
     let grf_vec = l_samples
