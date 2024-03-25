@@ -47,7 +47,7 @@ def objective(trial, wandb_group, console, progress, task_id):
         "hidden_depth": trial.suggest_int("hidden_depth", 2, 4),
         "hidden_activation": create_activation(trial.suggest_categorical("hidden_activation", ['ReLU', 'GELU', 'SiLU', 'Mish'])),
         "learning_rate": trial.suggest_float("learning_rate", 1e-3, 1e-1, log=True),
-        "power": trial.suggest_float("power", 0.5, 2.0),
+        "power": trial.suggest_float("power", 0.5, 2.5),
         "batch_size": 5000,
         "epochs": 200
     }
@@ -57,7 +57,7 @@ def objective(trial, wandb_group, console, progress, task_id):
 
     optimizer = Adam(model.parameters(), lr=hparams["learning_rate"])
     # scheduler = OneCycleLR(optimizer, max_lr=hparams["learning_rate"], epochs=hparams["epochs"], steps_per_epoch=len(dl_train))
-    scheduler = PolynomialLR(optimizer, total_iters=int(hparams["epochs"] * 0.9), power=hparams["power"])
+    scheduler = PolynomialLR(optimizer, total_iters=int(hparams["epochs"]), power=hparams["power"])
     # scheduler = CosineAnnealingLR(optimizer, T_max=hparams["T_max"], eta_min=hparams["eta_min"])
 
     wandb_group = "completed"
@@ -112,9 +112,9 @@ if __name__ == "__main__":
     ds_val = IntegralData(grf_val, y_val, grf_int_val)
     ds_test = IntegralData(grf_test, y_test, grf_int_test)
 
-    dl_train = DataLoader(ds_train, batch_size=1000, shuffle=True, collate_fn=collate_fn)
-    dl_val = DataLoader(ds_val, batch_size=1000, collate_fn=collate_fn)
-    dl_test = DataLoader(ds_test, batch_size=1000, collate_fn=collate_fn)
+    dl_train = DataLoader(ds_train, batch_size=5000, shuffle=True, collate_fn=collate_fn)
+    dl_val = DataLoader(ds_val, batch_size=5000, collate_fn=collate_fn)
+    dl_test = DataLoader(ds_test, batch_size=5000, collate_fn=collate_fn)
 
     sampler = TPESampler(seed=42)
     # sampler = BoTorchSampler(seed=42)
