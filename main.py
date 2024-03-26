@@ -48,7 +48,7 @@ def objective(trial, wandb_group, console, progress, task_id):
         "hidden_size": trial.suggest_categorical("hidden_size", [32, 64, 128]),
         "hidden_depth": trial.suggest_int("hidden_depth", 2, 4),
         # "hidden_activation": create_activation(trial.suggest_categorical("hidden_activation", ['ReLU', 'GELU', 'SiLU', 'Mish'])),
-        "hidden_activation": create_activation("Mish"),
+        "hidden_activation": create_activation("GELU"),
         "learning_rate": trial.suggest_float("learning_rate", 1e-3, 1e-1, log=True),
         # "power": trial.suggest_float("power", 0.5, 2.5),
         "power": 2.0,
@@ -133,9 +133,9 @@ if __name__ == "__main__":
     with progress:
         task_id = progress.add_task("[green]Optuna Trials", total=args.n_trials)
 
-        study = optuna.create_study(direction="minimize", sampler=sampler, pruner=pruner, study_name="DeepONet_Trials", storage="sqlite:///optuna.db", load_if_exists=True)
+        study = optuna.create_study(direction="minimize", sampler=sampler, pruner=pruner, study_name="DeepONet_GELU", storage="sqlite:///optuna.db", load_if_exists=True)
 
-        study.optimize(lambda trial: objective(trial, "Optuna3", console, progress, task_id),
+        study.optimize(lambda trial: objective(trial, "Optuna", console, progress, task_id),
                        n_trials=args.n_trials)
 
     print("Best trial:")

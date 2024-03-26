@@ -29,7 +29,7 @@ import numpy as np
 import polars as pl
 
 # Load the best study
-study = optuna.load_study(study_name="DeepONet_Trials", storage="sqlite:///optuna.db")
+study = optuna.load_study(study_name="DeepONet_GELU", storage="sqlite:///optuna.db")
 best_trial = study.best_trial
 checkpoint = best_trial.user_attrs["checkpoint"]
 print(f"Best trial: {best_trial.number}")
@@ -45,7 +45,7 @@ hparams["dim_output"] = 1
 hparams["batch_size"] = 500
 hparams["epochs"] = 200
 # hparams["hidden_activation"] = create_activation(hparams["hidden_activation"])
-hparams["hidden_activation"] = create_activation("Mish")
+hparams["hidden_activation"] = create_activation("GELU")
 
 # Load the best model
 model = DeepONetScratch(hparams)
