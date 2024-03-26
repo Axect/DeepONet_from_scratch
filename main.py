@@ -32,7 +32,7 @@ from deeponet.data import load_data, train_val_test_split, IntegralData, collate
 from deeponet.train import train_epoch, evaluate
 from deeponet.utils import create_activation
 
-BATCH_SIZE = 250
+BATCH_SIZE = 125
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='DeepONet Hyperparameter Tuning with Optuna')
@@ -136,7 +136,7 @@ if __name__ == "__main__":
     with progress:
         task_id = progress.add_task("[green]Optuna Trials", total=args.n_trials)
 
-        study = optuna.create_study(direction="minimize", sampler=sampler, pruner=pruner, study_name="DeepONet_fix_250", storage="sqlite:///optuna.db", load_if_exists=True)
+        study = optuna.create_study(direction="minimize", sampler=sampler, pruner=pruner, study_name="DeepONet_fix_125", storage="sqlite:///optuna.db", load_if_exists=True)
 
         study.optimize(lambda trial: objective(trial, "Optuna", console, progress, task_id),
                        n_trials=args.n_trials)
