@@ -53,7 +53,7 @@ model.load_state_dict(torch.load(checkpoint))
 
 # Load data
 data_path = "data/"
-x, y, grfs, grf_ints, n_samples = load_data(data_path, random=False)
+x, y, grfs, grf_ints, n_samples = load_data(data_path, random=True)
 ds = IntegralData(grfs, y, grf_ints)
 
 # Evaluate the best model
