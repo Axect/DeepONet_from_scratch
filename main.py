@@ -108,7 +108,7 @@ if __name__ == "__main__":
     print(device)
 
     data_path = "data/"
-    x, y, grfs, grf_ints, n_samples = load_data(data_path)
+    x, y, grfs, grf_ints, n_samples = load_data(data_path, random=False)
 
     grf_train, grf_val, grf_test, y_train, y_val, y_test, grf_int_train, grf_int_val, grf_int_test = train_val_test_split(n_samples, grfs, y, grf_ints)
 
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     with progress:
         task_id = progress.add_task("[green]Optuna Trials", total=args.n_trials)
 
-        study = optuna.create_study(direction="minimize", sampler=sampler, pruner=pruner, study_name="DeepONet_GELU", storage="sqlite:///optuna.db", load_if_exists=True)
+        study = optuna.create_study(direction="minimize", sampler=sampler, pruner=pruner, study_name="DeepONet_fix", storage="sqlite:///optuna.db", load_if_exists=True)
 
         study.optimize(lambda trial: objective(trial, "Optuna", console, progress, task_id),
                        n_trials=args.n_trials)

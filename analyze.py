@@ -29,7 +29,7 @@ import numpy as np
 import polars as pl
 
 # Load the best study
-study = optuna.load_study(study_name="DeepONet_GELU", storage="sqlite:///optuna.db")
+study = optuna.load_study(study_name="DeepONet_fix", storage="sqlite:///optuna.db")
 best_trial = study.best_trial
 checkpoint = best_trial.user_attrs["checkpoint"]
 print(f"Best trial: {best_trial.number}")
@@ -53,7 +53,7 @@ model.load_state_dict(torch.load(checkpoint))
 
 # Load data
 data_path = "data/"
-x, y, grfs, grf_ints, n_samples = load_data(data_path)
+x, y, grfs, grf_ints, n_samples = load_data(data_path, random=False)
 ds = IntegralData(grfs, y, grf_ints)
 
 # Evaluate the best model

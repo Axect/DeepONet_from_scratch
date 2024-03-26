@@ -3,9 +3,10 @@ import polars as pl
 import torch
 from torch.utils.data import Dataset, DataLoader
 
-def load_data(path):
-    df_grf = pl.read_parquet(path  + "grf_random_l.parquet")
-    df_grf_int = pl.read_parquet(path + "grf_random_l_int.parquet")
+def load_data(path, random=False):
+    randomness = "random" if random else "fix"
+    df_grf = pl.read_parquet(path + f"grf_{randomness}_l.parquet")
+    df_grf_int = pl.read_parquet(path + f"grf_{randomness}_l_int.parquet")
     
     n_samples = df_grf["group"].n_unique()
     
