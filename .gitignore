@@ -9,3 +9,5 @@ deeponet/__pycache__/
 DeepONet_Trials/
 DeepONet_Trials2/
 *.db
+DeepONet_Trials*/
+figs/*.html

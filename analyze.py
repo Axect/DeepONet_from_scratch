@@ -44,7 +44,8 @@ hparams["num_output"] = 100
 hparams["dim_output"] = 1
 hparams["batch_size"] = 500
 hparams["epochs"] = 200
-hparams["hidden_activation"] = create_activation(hparams["hidden_activation"])
+# hparams["hidden_activation"] = create_activation(hparams["hidden_activation"])
+hparams["hidden_activation"] = create_activation("Mish")
 
 # Load the best model
 model = DeepONetScratch(hparams)
@@ -58,6 +59,10 @@ ds = IntegralData(grfs, y, grf_ints)
 # Evaluate the best model
 model.eval()
 (u_test, y_test, Guy_test) = ds[0]
+
+# sort y_test, Guy test
+y_test, indices = torch.sort(y_test)
+Guy_test = Guy_test[indices]
 
 predict_plot(model, u_test, y_test, Guy_test, "figs/test.png")
 

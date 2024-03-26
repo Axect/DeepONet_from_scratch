@@ -7,7 +7,7 @@ fn main() {
     // Gaussian Random Field generation
     let x_min = 0f64;
     let x_max = 1f64;
-    let n = 100000;
+    let n = 10000;
     let x_len = 1000;
     //let l_uniform = WeightedUniform::new(
     //    vec![3f64, 3f64, 2f64, 2f64],
@@ -46,8 +46,9 @@ fn main() {
         }).collect::<Vec<_>>();
 
     let x = linspace_with_precision(x_min, x_max, x_len, 3);
-    let y_range = linspace_with_precision(x_min, x_max, 100, 3);
-
+    let u_y = Uniform(x_min, x_max);
+    let y_range = u_y.sample(100);
+    
     // Integration
     let grf_int_vec = grf_scaled_vec
         .par_iter()
@@ -110,9 +111,14 @@ fn main() {
         .savefig()
         .unwrap();
 
+    let mut y_range_enum = y_range.into_iter().enumerate().collect::<Vec<_>>();
+    y_range_enum.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+    let (y_idx, y_range): (Vec<usize>, Vec<f64>) = y_range_enum.into_iter().unzip();
+
     let mut plt = Plot2D::new();
     plt.set_domain(y_range);
     for sol in grf_int_vec.iter().take(samples) {
+        let sol = y_idx.iter().map(|&i| sol[i]).collect::<Vec<_>>();
         plt.insert_image(sol.clone());
     }
     plt

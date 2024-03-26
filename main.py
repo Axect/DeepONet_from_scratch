@@ -4,7 +4,7 @@ import os
 # Optuna for hyperparameter tuning
 import optuna
 from optuna.samplers import TPESampler
-from optuna.pruners import MedianPruner, WilcoxonPruner, PercentilePruner
+from optuna.pruners import MedianPruner, WilcoxonPruner, PercentilePruner, HyperbandPruner
 from optuna.storages import RetryFailedTrialCallback
 from optuna.visualization import plot_optimization_history, plot_param_importances
 from optuna_integration import BoTorchSampler
@@ -32,6 +32,8 @@ from deeponet.data import load_data, train_val_test_split, IntegralData, collate
 from deeponet.train import train_epoch, evaluate
 from deeponet.utils import create_activation
 
+BATCH_SIZE = 500
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description='DeepONet Hyperparameter Tuning with Optuna')
     parser.add_argument('--n_trials', type=int, default=100, help='Number of trials for Optuna (default: 100)')
@@ -43,12 +45,14 @@ def objective(trial, wandb_group, console, progress, task_id):
         "num_branch": trial.suggest_categorical("num_branch", [10, 20, 30]),
         "num_output": 100,
         "dim_output": 1,
-        "hidden_size": trial.suggest_categorical("hidden_size", [64, 128, 256]),
+        "hidden_size": trial.suggest_categorical("hidden_size", [32, 64, 128]),
         "hidden_depth": trial.suggest_int("hidden_depth", 2, 4),
-        "hidden_activation": create_activation(trial.suggest_categorical("hidden_activation", ['ReLU', 'GELU', 'SiLU', 'Mish'])),
+        # "hidden_activation": create_activation(trial.suggest_categorical("hidden_activation", ['ReLU', 'GELU', 'SiLU', 'Mish'])),
+        "hidden_activation": create_activation("Mish"),
         "learning_rate": trial.suggest_float("learning_rate", 1e-3, 1e-1, log=True),
-        "power": trial.suggest_float("power", 0.5, 2.5),
-        "batch_size": 5000,
+        # "power": trial.suggest_float("power", 0.5, 2.5),
+        "power": 2.0,
+        "batch_size": BATCH_SIZE,
         "epochs": 200
     }
 
@@ -67,7 +71,7 @@ def objective(trial, wandb_group, console, progress, task_id):
         os.makedirs(checkpoint_dir)
     
     try:
-        run = wandb.init(project="DeepONet-Optuna", group=wandb_group, config=hparams, reinit=False)
+        run = wandb.init(project="DeepONet-Optuna-y", group=wandb_group, config=hparams, reinit=False)
         for epoch in range(hparams["epochs"]):
             train_loss = train_epoch(model, optimizer, dl_train, device)
             val_loss = evaluate(model, dl_val, device)
@@ -112,18 +116,19 @@ if __name__ == "__main__":
     ds_val = IntegralData(grf_val, y_val, grf_int_val)
     ds_test = IntegralData(grf_test, y_test, grf_int_test)
 
-    dl_train = DataLoader(ds_train, batch_size=5000, shuffle=True, collate_fn=collate_fn)
-    dl_val = DataLoader(ds_val, batch_size=5000, collate_fn=collate_fn)
-    dl_test = DataLoader(ds_test, batch_size=5000, collate_fn=collate_fn)
+    dl_train = DataLoader(ds_train, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
+    dl_val = DataLoader(ds_val, batch_size=BATCH_SIZE, collate_fn=collate_fn)
+    dl_test = DataLoader(ds_test, batch_size=BATCH_SIZE, collate_fn=collate_fn)
 
-    sampler = TPESampler(seed=42)
-    # sampler = BoTorchSampler(seed=42)
+    # sampler = TPESampler(seed=42)
+    sampler = BoTorchSampler(seed=42)
 
     console = Console()
     progress = Progress()
-    pruner = MedianPruner(n_startup_trials=10, n_warmup_steps=10, interval_steps=1)
+    # pruner = MedianPruner(n_startup_trials=10, n_warmup_steps=10, interval_steps=1)
     # pruner = WilcoxonPruner(p_threshold=0.2, n_startup_steps=10)
     # pruner = PercentilePruner(25.0, n_startup_trials=10, n_warmup_steps=10, interval_steps=10)
+    pruner = HyperbandPruner()
 
     with progress:
         task_id = progress.add_task("[green]Optuna Trials", total=args.n_trials)
