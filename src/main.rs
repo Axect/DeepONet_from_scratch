@@ -13,8 +13,9 @@ fn main() {
     //    vec![3f64, 3f64, 2f64, 2f64],
     //    vec![0.1, 0.2, 0.3, 0.4, 0.5],
     //);
-    let l_uniform = Uniform(0.1, 0.4);
-    let l_samples = l_uniform.sample(n);
+    //let l_uniform = Uniform(0.1, 0.4);
+    //let l_samples = l_uniform.sample(n);
+    let l_samples = vec![0.2; n];
 
     let grf_vec = l_samples
         .iter()
@@ -68,7 +69,7 @@ fn main() {
     df.push("x", Series::new(x_cycle));
     df.push("grf", Series::new(grf_flatten));
     df.push("group", Series::new(group));
-    df.write_parquet("data/grf_random_l.parquet", CompressionOptions::Uncompressed).unwrap();
+    df.write_parquet("data/grf_fix_l.parquet", CompressionOptions::Uncompressed).unwrap();
     df.print();
 
     let mut dg = DataFrame::new(vec![]);
@@ -78,7 +79,7 @@ fn main() {
     dg.push("y", Series::new(y_cycle));
     dg.push("grf_int", Series::new(grf_int_flatten));
     dg.push("group", Series::new(group));
-    dg.write_parquet("data/grf_random_l_int.parquet", CompressionOptions::Uncompressed).unwrap();
+    dg.write_parquet("data/grf_fix_l_int.parquet", CompressionOptions::Uncompressed).unwrap();
     dg.print();
 
     // Plot grf
@@ -99,7 +100,7 @@ fn main() {
         plt.insert_image(grf.clone());
     }
     plt
-        .set_path("figs/grf_random_l_scaled.png")
+        .set_path("figs/grf_fix_l_scaled.png")
         .set_xlabel(r"$x$")
         .set_ylabel(r"$y$")
         .set_style(PlotStyle::Nature)
@@ -122,7 +123,7 @@ fn main() {
         plt.insert_image(sol.clone());
     }
     plt
-        .set_path("figs/grf_random_l_integral.png")
+        .set_path("figs/grf_fix_l_integral.png")
         .set_xlabel(r"$x$")
         .set_ylabel(r"$y$")
         .set_style(PlotStyle::Nature)
