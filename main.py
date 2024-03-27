@@ -55,9 +55,13 @@ def objective(trial, wandb_group, console, progress, task_id):
         "learning_rate": trial.suggest_float("learning_rate", 1e-4, 1e-2, log=True),
         # "power": trial.suggest_float("power", 0.5, 2.5),
         "power": 2.0,
-        "batch_size": BATCH_SIZE,
+        "batch_size": trial.suggest_categorical("batch_size", [50, 100, 250, 500, 1000]),
         "epochs": 200
     }
+
+    dl_train = DataLoader(ds_train, batch_size=hparams["batch_size"], shuffle=True, collate_fn=collate_fn)
+    dl_val = DataLoader(ds_val, batch_size=hparams["batch_size"], collate_fn=collate_fn)
+    dl_test = DataLoader(ds_test, batch_size=hparams["batch_size"], collate_fn=collate_fn)
 
     model = DeepONetScratch(hparams)
     model.to(device)
@@ -74,7 +78,7 @@ def objective(trial, wandb_group, console, progress, task_id):
         os.makedirs(checkpoint_dir)
     
     try:
-        run = wandb.init(project="DeepONet-Optuna-y", group=wandb_group, config=hparams, reinit=False)
+        run = wandb.init(project="DeepONet-Optuna-batch", group=wandb_group, config=hparams, reinit=False)
         for epoch in range(hparams["epochs"]):
             train_loss = train_epoch(model, optimizer, dl_train, device)
             val_loss = evaluate(model, dl_val, device)
@@ -119,9 +123,9 @@ if __name__ == "__main__":
     ds_val = IntegralData(grf_val, y_val, grf_int_val)
     ds_test = IntegralData(grf_test, y_test, grf_int_test)
 
-    dl_train = DataLoader(ds_train, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
-    dl_val = DataLoader(ds_val, batch_size=BATCH_SIZE, collate_fn=collate_fn)
-    dl_test = DataLoader(ds_test, batch_size=BATCH_SIZE, collate_fn=collate_fn)
+    #dl_train = DataLoader(ds_train, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
+    #dl_val = DataLoader(ds_val, batch_size=BATCH_SIZE, collate_fn=collate_fn)
+    #dl_test = DataLoader(ds_test, batch_size=BATCH_SIZE, collate_fn=collate_fn)
 
     # sampler = TPESampler(seed=42)
     sampler = BoTorchSampler(seed=42)
@@ -136,7 +140,7 @@ if __name__ == "__main__":
     with progress:
         task_id = progress.add_task("[green]Optuna Trials", total=args.n_trials)
 
-        study = optuna.create_study(direction="minimize", sampler=sampler, pruner=pruner, study_name="DeepONet_fix_125", storage="sqlite:///optuna.db", load_if_exists=True)
+        study = optuna.create_study(direction="minimize", sampler=sampler, pruner=pruner, study_name="DeepONet_Batch", storage="sqlite:///optuna.db", load_if_exists=True)
 
         study.optimize(lambda trial: objective(trial, "Optuna", console, progress, task_id),
                        n_trials=args.n_trials)
