@@ -1,4 +1,4 @@
-use rugfield::gen_grf;
+use rugfield::{grf, Kernel};
 use peroxide::fuga::*;
 use rayon::prelude::*;
 use indicatif::{ProgressBar, ParallelProgressIterator};
@@ -9,17 +9,11 @@ fn main() {
     let x_max = 1f64;
     let n = 10000;
     let x_len = 1000;
-    //let l_uniform = WeightedUniform::new(
-    //    vec![3f64, 3f64, 2f64, 2f64],
-    //    vec![0.1, 0.2, 0.3, 0.4, 0.5],
-    //);
-    //let l_uniform = Uniform(0.1, 0.4);
-    //let l_samples = l_uniform.sample(n);
     let l_samples = vec![0.2; n];
 
     let grf_vec = l_samples
         .iter()
-        .map(|&l| gen_grf(x_min, x_max, l, x_len))
+        .map(|&l| grf(x_len, Kernel::Matern(1.5, l)))
         .collect::<Vec<_>>();
 
     // Normalize
@@ -84,10 +78,14 @@ fn main() {
 
     // Plot grf
     let samples = 4;
-    let line_style = [LineStyle::Solid, LineStyle::Dotted, LineStyle::Dashed, LineStyle::DashDot];
-    let line_style = line_style.iter().cycle().take(samples).cloned().collect::<Vec<_>>();
-    let color = ["darkblue", "red", "darkgreen", "darkorange", "purple"];
-    let color = color.iter().cycle().take(samples).cloned().collect::<Vec<_>>();
+    let line_style_cands = [LineStyle::Solid, LineStyle::Dashed, LineStyle::Dotted, LineStyle::DashDot];
+    let color_cands = ["darkblue", "red", "darkgreen", "darkorange", "purple"];
+    let mut line_style = vec![];
+    let mut color = vec![];
+    for i in 0 .. samples {
+        line_style.push((i, line_style_cands[i % line_style_cands.len()]));
+        color.push((i, color_cands[i % color_cands.len()]));
+    }
     let legends = (1 ..=samples).map(|i| format!(r"GRF$_{}$", i)).collect::<Vec<_>>();
     let legends_str = legends
         .iter()
@@ -100,7 +98,7 @@ fn main() {
         plt.insert_image(grf.clone());
     }
     plt
-        .set_path("figs/grf_fix_l_scaled.png")
+        .set_path("figs/grf_matern_fix_l.png")
         .set_xlabel(r"$x$")
         .set_ylabel(r"$y$")
         .set_style(PlotStyle::Nature)
@@ -123,7 +121,7 @@ fn main() {
         plt.insert_image(sol.clone());
     }
     plt
-        .set_path("figs/grf_fix_l_integral.png")
+        .set_path("figs/grf_matern_fix_l_integral.png")
         .set_xlabel(r"$x$")
         .set_ylabel(r"$y$")
         .set_style(PlotStyle::Nature)

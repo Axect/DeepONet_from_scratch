@@ -32,7 +32,7 @@ from deeponet.data import load_data, train_val_test_split, IntegralData, collate
 from deeponet.train import train_epoch, evaluate
 from deeponet.utils import create_activation
 
-BATCH_SIZE = 125
+BATCH_SIZE = 500
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='DeepONet Hyperparameter Tuning with Optuna')
@@ -55,7 +55,7 @@ def objective(trial, wandb_group, console, progress, task_id):
         "learning_rate": trial.suggest_float("learning_rate", 1e-4, 1e-2, log=True),
         # "power": trial.suggest_float("power", 0.5, 2.5),
         "power": 2.0,
-        "batch_size": trial.suggest_categorical("batch_size", [50, 100, 250, 500, 1000]),
+        "batch_size": BATCH_SIZE,
         "epochs": 200
     }
 
@@ -78,7 +78,7 @@ def objective(trial, wandb_group, console, progress, task_id):
         os.makedirs(checkpoint_dir)
     
     try:
-        run = wandb.init(project="DeepONet-Optuna-batch", group=wandb_group, config=hparams, reinit=False)
+        run = wandb.init(project="DeepONet-Optuna-Matern", group=wandb_group, config=hparams, reinit=False)
         for epoch in range(hparams["epochs"]):
             train_loss = train_epoch(model, optimizer, dl_train, device)
             val_loss = evaluate(model, dl_val, device)
@@ -140,7 +140,7 @@ if __name__ == "__main__":
     with progress:
         task_id = progress.add_task("[green]Optuna Trials", total=args.n_trials)
 
-        study = optuna.create_study(direction="minimize", sampler=sampler, pruner=pruner, study_name="DeepONet_Batch", storage="sqlite:///optuna.db", load_if_exists=True)
+        study = optuna.create_study(direction="minimize", sampler=sampler, pruner=pruner, study_name="DeepONet_Matern", storage="sqlite:///optuna.db", load_if_exists=True)
 
         study.optimize(lambda trial: objective(trial, "Optuna", console, progress, task_id),
                        n_trials=args.n_trials)

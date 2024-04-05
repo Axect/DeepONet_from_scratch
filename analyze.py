@@ -29,7 +29,7 @@ import numpy as np
 import polars as pl
 
 # Load the best study
-study = optuna.load_study(study_name="DeepONet_Batch", storage="sqlite:///optuna.db")
+study = optuna.load_study(study_name="DeepONet_Matern", storage="sqlite:///optuna.db")
 best_trial = study.best_trial
 checkpoint = best_trial.user_attrs["checkpoint"]
 print(f"Best trial: {best_trial.number}")
@@ -42,7 +42,7 @@ hparams = best_trial.params
 hparams["num_input"] = 100
 hparams["num_output"] = 100
 hparams["dim_output"] = 1
-#hparams["batch_size"] = 125
+hparams["batch_size"] = 500
 hparams["hidden_size"] = 64
 hparams["hidden_depth"] = 4
 hparams["num_branch"] = 10
