@@ -65,7 +65,7 @@ for i in range(5):
     x = np.linspace(0, 1, len(u))
     
     # Plot the potential
-    predictor.potential_plot(x, u, name=f"potential_val_{i}")
+    predictor.potential_plot(x, u, name=f"grf_val_{i}")
     
     # Plot the prediction
     predictor.predict_plot(u, y, Guy, name=f"prediction_val_{i}")

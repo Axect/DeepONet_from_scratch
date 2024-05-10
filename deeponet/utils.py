@@ -29,7 +29,7 @@ class Predictor:
             ax.autoscale(tight=True)
             ax.plot(x, u)
             ax.set_xlabel(r"$x$")
-            ax.set_ylabel(r"$V(x)$")
+            ax.set_ylabel(r"$u(x)$")
             plt.savefig(f"{self.path}/{name}.png", dpi=600, bbox_inches="tight")
 
     def predict_plot(self, u, y, Guy, name="prediction"):
@@ -46,8 +46,8 @@ class Predictor:
             ax.autoscale(tight=True)
             ax.plot(y, Guy, 'r--', label="Exact", alpha=0.6)
             ax.plot(y, Guy_pred, 'g-.', label="Predicted", alpha=0.6)
-            ax.set_xlabel(r"$t$")
-            ax.set_ylabel(r"$x(t)$")
+            ax.set_xlabel(r"$y$")
+            ax.set_ylabel(r"$G(u)(y)$")
             plt.savefig(f"{self.path}/{name}.png", dpi=600, bbox_inches="tight")
 
 class VAEPredictor(Predictor):
