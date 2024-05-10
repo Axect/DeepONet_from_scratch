@@ -5,6 +5,6 @@ edition = "2021"
 
 [dependencies]
 indicatif = { version = "0.17.8", features = ["rayon"] }
-peroxide = { version = "0.35", features = ["plot", "parquet"] }
+peroxide = { version = "0.37", features = ["plot", "parquet"] }
 rayon = "1.9.0"
 rugfield = "0.2.0"
