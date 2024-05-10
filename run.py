@@ -110,8 +110,8 @@ def main():
     model, hparams, run_name, model_type = define_model()
 
     # Load dataset
-    options = ["more", "much"]
-    more_or_much = survey.routines.select("Do you want more or much?", options=["more", "much"])
+    options = ["normal", "more"]
+    more_or_much = survey.routines.select("Do you want normal or more?", options=options)
     more_or_much = options[more_or_much]
     ds_train = train_dataset(more_or_much)
     ds_val = val_dataset(more_or_much)
@@ -142,7 +142,7 @@ def main():
 
     # Trainer
     trainer = VAETrainer(model, optimizer, scheduler, device) if model_type == 1 else Trainer(model, optimizer, scheduler, device)
-    wandb.init(project="DeepONet-Hamilton-Bound", config=hparams, name=run_name)
+    wandb.init(project="DeepONet-Integral", config=hparams, name=run_name)
     
     # Train model
     epochs = hparams["epochs"]

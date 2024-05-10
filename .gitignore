@@ -11,3 +11,4 @@ DeepONet_Trials2/
 *.db
 DeepONet_*/
 figs/*.html
+*.parquet

@@ -3,23 +3,20 @@ import torch
 from torch import nn
 import math
 
-def create_net(sizes, hidden_activation):
+def create_net(sizes):
     net = []
     for i in range(len(sizes)-1):
         net.append(nn.Linear(sizes[i], sizes[i+1]))
         if i < len(sizes)-2:
-            net.append(hidden_activation)
+            net.append(nn.GELU())
     return nn.Sequential(*net)
 
-class DeepONetScratch(nn.Module):
+class DeepONet(nn.Module):
     def __init__(self, hparams):
         super().__init__()
         
-        self.branch_net = create_net([hparams["num_input"]] + [hparams["hidden_size"]]*(hparams["hidden_depth"]-1) + [hparams["num_branch"]], 
-                                     hparams["hidden_activation"])
-        self.trunk_net = create_net([hparams["dim_output"]] + [hparams["hidden_size"]]*(hparams["hidden_depth"]-1) + [hparams["num_branch"]],
-                                    hparams["hidden_activation"])
-        
+        self.branch_net = create_net([hparams["num_input"]] + [hparams["hidden_size"]]*(hparams["branch_hidden_depth"]-1) + [hparams["num_branch"]]) 
+        self.trunk_net = create_net([hparams["dim_output"]] + [hparams["hidden_size"]]*(hparams["trunk_hidden_depth"]-1) + [hparams["num_branch"]])
         self.bias = nn.Parameter(torch.randn(1), requires_grad=True)
 
     def forward(self, u, y):  
@@ -28,7 +25,7 @@ class DeepONetScratch(nn.Module):
         trunk_out = torch.stack([self.trunk_net(y[:, i:i+1]) for i in range(l)], dim=2)
         pred = torch.einsum("bp,bpl->bl", branch_out, trunk_out) + self.bias
         return pred
-
+    
 class Encoder(nn.Module):
     def __init__(self, hidden_size=10, num_layers=1, dropout=0.1):
         super().__init__()
