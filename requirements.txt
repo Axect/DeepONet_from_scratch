@@ -291,7 +291,7 @@ platformdirs==4.2.1
     #   jupyter-core
     #   wandb
 plotly==5.22.0
-polars==0.20.24
+polars==0.20.25
 pretty-errors==1.2.25
     # via torchmetrics
 prometheus-client==0.20.0
@@ -451,11 +451,13 @@ traitlets==5.14.3
     #   nbconvert
     #   nbformat
 triton==2.3.0
+    # via torch
 types-python-dateutil==2.9.0.20240316
     # via arrow
 typing-extensions==4.11.0
     # via
     #   alembic
+    #   ipython
     #   lightning
     #   lightning-utilities
     #   pytorch-lightning
