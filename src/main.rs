@@ -5,7 +5,7 @@ use rayon::prelude::*;
 use indicatif::{ProgressBar, ParallelProgressIterator};
 
 fn main() -> std::result::Result<(), Box<dyn Error>> {
-    let n = 1_0000usize;
+    let n = 10_0000usize;
 
     println!("Generate dataset...");
     let ds = Dataset::generate(n, 0.8)?;
