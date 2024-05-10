@@ -82,6 +82,8 @@ impl Dataset {
             })
             .collect::<Vec<_>>();
 
+        // choose 100 points from 0 to 1
+        let u_vec = u_vec.iter().map(|x| x.iter().step_by(10).cloned().collect::<Vec<_>>()).collect::<Vec<_>>();
         let y_vec = vec![y_range.clone(); n];
 
         let n_train = (n as f64 * f_train).round() as usize;
