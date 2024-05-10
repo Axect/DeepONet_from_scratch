@@ -58,7 +58,7 @@ else:
 # Validation dataset
 # ==============================================================================
 # Load the data
-ds_val = val_dataset()
+ds_val = val_dataset("normal")
 
 for i in range(5):
     u, y, Guy = ds_val[i]
