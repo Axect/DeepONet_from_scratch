@@ -75,12 +75,12 @@ def define_model():
         run_name = f"vae_{hidden_size}_{num_layers}_{latent_size}"
     elif model_type == 0:
         num_input           = 100
-        num_branch          = survey.routines.numeric("Enter num_branch (e.g. 10)", decimal=False)
-        num_output          = 100
-        dim_output          = 1
         hidden_size         = survey.routines.numeric("Enter hidden_size (e.g. 64)", decimal=False)
+        num_branch          = survey.routines.numeric("Enter num_branch (e.g. 10)", decimal=False)
         branch_hidden_depth = survey.routines.numeric("Enter branch_hidden_depth (e.g. 4)", decimal=False)
         trunk_hidden_depth  = survey.routines.numeric("Enter trunk_hidden_depth (e.g. 4)", decimal=False)
+        num_output          = 100
+        dim_output          = 1
         learning_rate       = survey.routines.numeric("Enter learning_rate (e.g. 1e-2)")
         batch_size          = survey.routines.numeric("Enter batch_size (e.g. 1000)", decimal=False)
         epochs              = survey.routines.numeric("Enter epochs (e.g. 500)", decimal=False)
