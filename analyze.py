@@ -69,3 +69,26 @@ for i in range(5):
     
     # Plot the prediction
     predictor.predict_plot(u, y, Guy, name=f"prediction_val_{i}")
+
+# ==============================================================================
+# Custom test
+# ==============================================================================
+# Polynomial
+x = torch.linspace(0, 1, 100)
+u = 4 * x * (x - 1) # 4x^2 - 4x
+y = torch.linspace(0, 1, 100)
+Guy = 4/3 * x**3 - 2 * x**2
+predictor.potential_plot(x, u, name=f"poly")
+predictor.predict_plot(u, y, Guy, name=f"predicion_poly")
+
+# Exponential
+u = torch.exp(x) / np.exp(1)
+Guy = (torch.exp(x) - 1) / np.exp(1)
+predictor.potential_plot(x, u, name=f"exp")
+predictor.predict_plot(u, y, Guy, name=f"predicion_exp")
+
+# Cosine
+u = torch.cos(x * 2 * np.pi)
+Guy = torch.sin(x * 2 * np.pi) / (2 * np.pi)
+predictor.potential_plot(x, u, name=f"cos")
+predictor.predict_plot(u, y, Guy, name=f"predicion_cos")
