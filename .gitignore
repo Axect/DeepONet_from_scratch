@@ -13,3 +13,4 @@ DeepONet_*/
 figs/*.html
 *.parquet
 checkpoints/
+*/efficient_kan/
