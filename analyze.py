@@ -1,13 +1,10 @@
 import torch
-from torch.utils.data import DataLoader
 
-from deeponet.model import DeepONet, VAONet, TFONet
+from deeponet.model import DeepONet, VAONet, TFONet, KANON
 from deeponet.data import val_dataset
 from deeponet.utils import VAEPredictor, Predictor
 
-import matplotlib.pyplot as plt
 import numpy as np
-import polars as pl
 
 import os
 import survey
@@ -25,15 +22,15 @@ checkpoint = f"checkpoints/{checkpoints[chosen]}"
 hparams = json.load(open(f"{checkpoint}/hparams.json", "r"))
 
 # Load the model
-## Check if checkpoint contains 'tf' or 'vae'
+# Check if checkpoint contains 'tf' or 'vae' or 'kan'
 if "tf" in checkpoint:
     model = TFONet(hparams)
     model.load_state_dict(torch.load(f"{checkpoint}/model.pth"))
     predictor = Predictor(
         model,
         device=device,
-        study_name = "DeepONet-Integral",
-        run_name = checkpoints[chosen]
+        study_name="DeepONet-Integral",
+        run_name=checkpoints[chosen]
     )
 elif "vae" in checkpoint:
     model = VAONet(hparams)
@@ -41,8 +38,17 @@ elif "vae" in checkpoint:
     predictor = VAEPredictor(
         model,
         device=device,
-        study_name = "DeepONet-Integral",
-        run_name = checkpoints[chosen]
+        study_name="DeepONet-Integral",
+        run_name=checkpoints[chosen]
+    )
+elif "kan" in checkpoint:
+    model = KANON(hparams)
+    model.load_state_dict(torch.load(f"{checkpoint}/model.pth"))
+    predictor = Predictor(
+        model,
+        device=device,
+        study_name="DeepONet-Integral",
+        run_name=checkpoints[chosen]
     )
 else:
     model = DeepONet(hparams)
@@ -50,8 +56,8 @@ else:
     predictor = Predictor(
         model,
         device=device,
-        study_name = "DeepONet-Integral",
-        run_name = checkpoints[chosen]
+        study_name="DeepONet-Integral",
+        run_name=checkpoints[chosen]
     )
 
 # ==============================================================================
@@ -63,10 +69,10 @@ ds_val = val_dataset("normal")
 for i in range(5):
     u, y, Guy = ds_val[i]
     x = np.linspace(0, 1, len(u))
-    
+
     # Plot the potential
     predictor.potential_plot(x, u, name=f"grf_val_{i}")
-    
+
     # Plot the prediction
     predictor.predict_plot(u, y, Guy, name=f"prediction_val_{i}")
 
@@ -75,7 +81,7 @@ for i in range(5):
 # ==============================================================================
 # Polynomial
 x = torch.linspace(0, 1, 100)
-u = 4 * x * (x - 1) # 4x^2 - 4x
+u = 4 * x * (x - 1)  # 4x^2 - 4x
 y = torch.linspace(0, 1, 100)
 Guy = 4/3 * x**3 - 2 * x**2
 predictor.potential_plot(x, u, name=f"poly")
