@@ -13,7 +13,7 @@ from rich.console import Console
 from rich.progress import Progress
 
 # Neural Hamilton modules
-from deeponet.model import DeepONet, VAONet, TFONet
+from deeponet.model import DeepONet, VAONet, TFONet, KANON
 from deeponet.data import train_dataset, val_dataset
 from deeponet.train import Trainer, VAETrainer
 
@@ -25,7 +25,7 @@ import json
 def define_model():
     model_type = survey.routines.select(
         "Select model type",
-        options=["DeepONet", "VAONet", "TFONet"]
+        options=["DeepONet", "VAONet", "TFONet", "KANON"]
     )
     if model_type == 2:
         d_model         = survey.routines.numeric("Enter d_model (e.g. 32)", decimal=False)
@@ -100,6 +100,28 @@ def define_model():
         }
         model = DeepONet(hparams)
         run_name = f"mlp_{hidden_size}_{num_branch}"
+    elif model_type == 3:
+        num_input         = 100
+        hidden_size       = survey.routines.numeric("Enter hidden_size (e.g. 64)", decimal=False)
+        hidden_depth      = survey.routines.numeric("Enter hidden_depth (e.g. 4)", decimal=False)
+        num_branch        = survey.routines.numeric("Enter num_branch (e.g. 10)", decimal=False)
+        learning_rate     = survey.routines.numeric("Enter learning_rate (e.g. 1e-2)")
+        batch_size        = survey.routines.numeric("Enter batch_size (e.g. 1000)", decimal=False)
+        epochs            = survey.routines.numeric("Enter epochs (e.g. 500)", decimal=False)
+        power             = survey.routines.numeric("Enter power (e.g. 2.0)")
+        hparams = {
+            "num_input": num_input,
+            "hidden_size": hidden_size,
+            "hidden_depth": hidden_depth,
+            "num_branch": num_branch,
+            "learning_rate": learning_rate,
+            "batch_size": batch_size,
+            "epochs": epochs,
+            "power": power
+        }
+        model = KANON(hparams)
+        run_name = f"kan_{hidden_size}_{hidden_depth}"
+
     return model, hparams, run_name, model_type
 
 def main():

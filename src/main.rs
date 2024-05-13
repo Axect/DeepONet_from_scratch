@@ -3,13 +3,19 @@ use peroxide::fuga::*;
 use peroxide::fuga::anyhow::Result;
 use rayon::prelude::*;
 use indicatif::{ProgressBar, ParallelProgressIterator};
+use dialoguer::{theme::ColorfulTheme, Select};
 
 fn main() -> std::result::Result<(), Box<dyn Error>> {
-    let n = 10_0000usize;
+    let normal_or_more = Select::with_theme(&ColorfulTheme::default())
+        .with_prompt("Normal or More?")
+        .items(&["Normal", "More"])
+        .default(0)
+        .interact()?;
+    let n = if normal_or_more == 0 { 10000 } else { 100000 };
 
     println!("Generate dataset...");
     let ds = Dataset::generate(n, 0.8)?;
-    ds.write_parquet()?;
+    ds.write_parquet(normal_or_more)?;
     println!("Generate dataset complete");
 
     Ok(())
@@ -129,8 +135,8 @@ impl Dataset {
     }
 
     #[allow(non_snake_case)]
-    pub fn write_parquet(&self) -> std::result::Result<(), Box<dyn std::error::Error>> {
-        let data_folder = "data";
+    pub fn write_parquet(&self, normal_or_more: usize) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        let data_folder = if normal_or_more == 0 { "data_normal" } else { "data_more" };
         if !std::path::Path::new(data_folder).exists() {
             std::fs::create_dir(data_folder)?;
         }
