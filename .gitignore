@@ -12,4 +12,5 @@ DeepONet_Trials2/
 DeepONet_*/
 figs/*.html
 *.parquet
+checkpoints/
 efficient_kan/
