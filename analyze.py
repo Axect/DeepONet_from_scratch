@@ -25,7 +25,8 @@ hparams = json.load(open(f"{checkpoint}/hparams.json", "r"))
 # Check if checkpoint contains 'tf' or 'vae' or 'kan'
 if "tf" in checkpoint:
     model = TFONet(hparams)
-    model.load_state_dict(torch.load(f"{checkpoint}/model.pth"))
+    model.load_state_dict(torch.load(
+        f"{checkpoint}/model.pth", map_location=device))
     predictor = Predictor(
         model,
         device=device,
@@ -34,7 +35,8 @@ if "tf" in checkpoint:
     )
 elif "vae" in checkpoint:
     model = VAONet(hparams)
-    model.load_state_dict(torch.load(f"{checkpoint}/model.pth"))
+    model.load_state_dict(torch.load(
+        f"{checkpoint}/model.pth", map_location=device))
     predictor = VAEPredictor(
         model,
         device=device,
@@ -43,7 +45,8 @@ elif "vae" in checkpoint:
     )
 elif "kan" in checkpoint:
     model = KANON(hparams)
-    model.load_state_dict(torch.load(f"{checkpoint}/model.pth"))
+    model.load_state_dict(torch.load(
+        f"{checkpoint}/model.pth", map_location=device))
     predictor = Predictor(
         model,
         device=device,
@@ -52,7 +55,8 @@ elif "kan" in checkpoint:
     )
 else:
     model = DeepONet(hparams)
-    model.load_state_dict(torch.load(f"{checkpoint}/model.pth"))
+    model.load_state_dict(torch.load(
+        f"{checkpoint}/model.pth", map_location=device))
     predictor = Predictor(
         model,
         device=device,
