@@ -1,6 +1,6 @@
 # PyTorch for deep learning
 import torch
-from torch.optim import Adam, AdamW
+from torch.optim import AdamW
 from torch.optim.lr_scheduler import PolynomialLR
 from torch.utils.data import DataLoader
 import lightning as L
@@ -9,12 +9,11 @@ import lightning as L
 import wandb
 
 # Rich for console output
-from rich.console import Console
 from rich.progress import Progress
 
 # Neural Hamilton modules
-from deeponet.model import DeepONet, VAONet, TFONet, KANON
-from deeponet.data import train_dataset, val_dataset
+from deeponet.model import DeepONet, VAONet, TFONet, KANON, VAKON
+from deeponet.data import train_dataset
 from deeponet.train import Trainer, VAETrainer
 
 import survey
@@ -27,7 +26,7 @@ import json
 def define_model():
     model_type = survey.routines.select(
         "Select model type",
-        options=["DeepONet", "VAONet", "TFONet", "KANON"]
+        options=["DeepONet", "VAONet", "TFONet", "KANON", "VAKON"]
     )
     if model_type == 2:
         d_model = survey.routines.numeric(
@@ -148,6 +147,35 @@ def define_model():
         }
         model = KANON(hparams)
         run_name = f"kan_{hidden_size}_{hidden_depth}_{num_branch}"
+    elif model_type == 4:
+        hidden_size = survey.routines.numeric(
+            "Enter hidden_size (e.g. 64)", decimal=False)
+        num_layers = survey.routines.numeric(
+            "Enter num_layers (e.g. 4)", decimal=False)
+        latent_size = survey.routines.numeric(
+            "Enter latent_size (e.g. 10)", decimal=False)
+        dropout = survey.routines.numeric("Enter dropout (e.g. 0.1)")
+        learning_rate = survey.routines.numeric(
+            "Enter learning_rate (e.g. 1e-2)")
+        kl_weight = survey.routines.numeric("Enter kl_weight (e.g. 1e-3)")
+        batch_size = survey.routines.numeric(
+            "Enter batch_size (e.g. 1000)", decimal=False)
+        epochs = survey.routines.numeric(
+            "Enter epochs (e.g. 100)", decimal=False)
+        power = survey.routines.numeric("Enter power (e.g. 2.0)")
+        hparams = {
+            "hidden_size": hidden_size,
+            "num_layers": num_layers,
+            "latent_size": latent_size,
+            "dropout": dropout,
+            "learning_rate": learning_rate,
+            "kl_weight": kl_weight,
+            "batch_size": batch_size,
+            "epochs": epochs,
+            "power": power
+        }
+        model = VAKON(hparams)
+        run_name = f"vak_{hidden_size}_{num_layers}_{latent_size}"
 
     return model, hparams, run_name, model_type
 
@@ -165,11 +193,8 @@ def main():
         "Do you want normal or more?", options=options)
     more_or_much = options[more_or_much]
     ds_train = train_dataset(more_or_much)
-    ds_val = val_dataset(more_or_much)
     dl_train = DataLoader(
         ds_train, batch_size=hparams["batch_size"], shuffle=True)
-    dl_val = DataLoader(
-        ds_val, batch_size=hparams["batch_size"], shuffle=False)
     run_name = f"{run_name}_{more_or_much}"
 
     # Device
@@ -196,8 +221,14 @@ def main():
         hparams["epochs"]), power=hparams["power"])
 
     # Trainer
-    trainer = VAETrainer(model, optimizer, scheduler, device) if model_type == 1 else Trainer(
-        model, optimizer, scheduler, device)
+    if model_type == 1 or model_type == 4:
+        trainer = VAETrainer(
+            model, optimizer, scheduler, device
+        )
+    else:
+        trainer = Trainer(
+            model, optimizer, scheduler, device
+        )
     wandb.init(project="DeepONet-Integral", config=hparams, name=run_name)
 
     # Train model
