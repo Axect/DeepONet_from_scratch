@@ -14,3 +14,4 @@ figs/*.html
 *.parquet
 checkpoints/
 efficient_kan/
+analysis/
